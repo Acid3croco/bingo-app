@@ -8,11 +8,14 @@ const Event = ({ id }) => {
   const event = events.find((e) => e.id === id)
 
   return (
-    <div className="event">
-      <span>{event.name}</span>
-      <button className="bg-red-300 rounded" onClick={() => deleteEvent(id)}>
-        Delete
+    <div className="flex gap-2 place-items-center">
+      <button
+        className="bg-red-300 rounded p-1 px-2"
+        onClick={() => deleteEvent(id)}
+      >
+        x
       </button>
+      <span>{event.name}</span>
     </div>
   )
 }

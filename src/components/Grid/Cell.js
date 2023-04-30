@@ -1,5 +1,3 @@
-// components/Cell/Cell.js
-
 import React, { useContext } from "react"
 import { BingoContext } from "@/contexts/BingoContext"
 
@@ -9,7 +7,9 @@ const Cell = ({ id }) => {
 
   return (
     <div
-      className={`cell ${event.checked ? "bg-green-300" : ""}`}
+      className={`cell flex items-center justify-center p-2 ${
+        event.checked ? "bg-green-300" : ""
+      }`}
       onClick={() => setCheckEvent(event)}
     >
       {event.name}

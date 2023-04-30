@@ -39,7 +39,6 @@ const BingoProvider = ({ children }) => {
 
   const setCheckEvent = async (event) => {
     event.checked = !event.checked
-    console.log(`Setting event ${event.id} to ${event.checked}`)
 
     const updatedEvents = grid.events.map((e) =>
       e.id === event.id ? event : e
@@ -122,6 +121,7 @@ const BingoProvider = ({ children }) => {
     loadGridFromFirebase(gridIdToLoad).then((loadedGrid) => {
       if (loadedGrid) {
         setGrid(loadedGrid)
+        window.localStorage.setItem("gridId", loadedGrid.id)
       } else {
         generateNewGrid()
       }
@@ -146,6 +146,17 @@ const BingoProvider = ({ children }) => {
       setEvents(eventsData)
     })
   }, [])
+
+  useEffect(() => {
+    if (grid) {
+      const unsubscribe = db
+        .collection("grids")
+        .doc(grid.id)
+        .onSnapshot((snapshot) => {
+          setGrid(snapshot.data())
+        })
+    }
+  }, [grid])
 
   return (
     <BingoContext.Provider

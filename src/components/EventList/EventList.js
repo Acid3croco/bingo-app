@@ -18,24 +18,33 @@ const EventList = () => {
   }
 
   return (
-    <div className="event-list">
-      <div className="add-event">
+    <div>
+      <hr className="p-4" />
+      <div className="pb-2">
         <input
           type="text"
           value={newEventName}
           onChange={handleInputChange}
           placeholder="Add new event"
+          className="border-2 border-gray-300 p-1 rounded"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleAddEvent()
             }
           }}
         />
-        <button onClick={handleAddEvent}>Add</button>
+        <button
+          className="bg-gray-500 text-white ml-2 p-2 rounded"
+          onClick={handleAddEvent}
+        >
+          Add
+        </button>
       </div>
-      {events.map((event) => (
-        <Event key={event.id} id={event.id} />
-      ))}
+      <div className="grid grid-cols-4">
+        {events.map((event) => (
+          <Event key={event.id} id={event.id} />
+        ))}
+      </div>
     </div>
   )
 }
