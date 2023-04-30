@@ -1,5 +1,12 @@
-import "@/styles/globals.css"
+import "../styles/globals.css"
+import { BingoProvider } from "../contexts/BingoContext"
 
-export default function App({ Component, pageProps }) {
-  return <Component {...pageProps} />
+function MyApp({ Component, pageProps }) {
+  return (
+    <BingoProvider>
+      <Component {...pageProps} />
+    </BingoProvider>
+  )
 }
+
+export default MyApp

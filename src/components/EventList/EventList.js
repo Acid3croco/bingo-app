@@ -1,46 +1,41 @@
-import React, { useState, useEffect } from "react"
-import db from "../../firebase/firebaseConfig"
-import Event from "./Event"
+import React, { useContext, useState } from "react"
+import { BingoContext } from "@/contexts/BingoContext"
+import Event from "@/components/EventList/Event"
 
 const EventList = () => {
-  const [events, setEvents] = useState([])
+  const { events, createEvent } = useContext(BingoContext)
+  const [newEventName, setNewEventName] = useState("")
 
-  useEffect(() => {
-    const unsubscribe = db
-      .collection("events")
-      .orderBy("createdAt")
-      .onSnapshot((snapshot) => {
-        setEvents(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })))
-      })
+  const handleAddEvent = () => {
+    if (newEventName.trim() !== "") {
+      createEvent(newEventName.trim())
+      setNewEventName("")
+    }
+  }
 
-    return () => unsubscribe()
-  }, [])
-
-  const addEvent = async (event) => {
-    await db.collection("events").add({
-      name: event,
-      createdAt: new Date()
-    })
+  const handleInputChange = (e) => {
+    setNewEventName(e.target.value)
   }
 
   return (
-    <div>
-      <h2>Events</h2>
-      <input
-        type="text"
-        placeholder="Add a new event"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            addEvent(e.target.value)
-            e.target.value = ""
-          }
-        }}
-      />
-      <ul>
-        {events.map((event) => (
-          <Event key={event.id} event={event} />
-        ))}
-      </ul>
+    <div className="event-list">
+      <div className="add-event">
+        <input
+          type="text"
+          value={newEventName}
+          onChange={handleInputChange}
+          placeholder="Add new event"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleAddEvent()
+            }
+          }}
+        />
+        <button onClick={handleAddEvent}>Add</button>
+      </div>
+      {events.map((event) => (
+        <Event key={event.id} id={event.id} />
+      ))}
     </div>
   )
 }

@@ -1,25 +1,30 @@
-import React from "react"
+// components/GridControls/GridControls.js
 
-const GridControls = ({ gridSize, onShuffle, onGridSizeChange }) => {
+import React, { useContext, useState } from "react"
+import { BingoContext } from "@/contexts/BingoContext"
+
+const GridControls = () => {
+  const { gridSize, handleImportGrid, generateNewGrid } =
+    useContext(BingoContext)
+  const [importId, setImportId] = useState("")
+
   return (
     <div>
-      <button
-        onClick={onShuffle}
-        className="bg-blue-500 text-white py-2 px-4 rounded"
-      >
-        Shuffle Grid
+      <button onClick={generateNewGrid}>Shuffle</button>
+      {/* <input
+        type="number"
+        value={gridSize}
+        onChange={(e) => handleGridSizeChange(e.target.value)}
+      /> */}
+      <input
+        type="text"
+        value={importId}
+        onChange={(e) => setImportId(e.target.value)}
+        placeholder="Grid ID"
+      />
+      <button onClick={() => handleImportGrid(importId)} value={importId}>
+        Import Grid
       </button>
-      <div className="mt-4">
-        <label htmlFor="gridSize">Grid Size:</label>
-        <input
-          type="number"
-          id="gridSize"
-          min="2"
-          max="10"
-          value={gridSize.rows}
-          onChange={(e) => onGridSizeChange(parseInt(e.target.value))}
-        />
-      </div>
     </div>
   )
 }

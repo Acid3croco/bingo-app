@@ -1,30 +1,22 @@
-import React from "react"
-import Cell from "./Cell"
+// components/Grid/Grid.js
 
-const Grid = ({ events, gridSize, checked, onCellClick }) => {
-  const gridRows = Array.from({ length: gridSize.rows }, (_, rowIndex) => {
-    const rowEvents = events.slice(
-      rowIndex * gridSize.columns,
-      (rowIndex + 1) * gridSize.columns
-    )
-    return (
-      <tr key={`row-${rowIndex}`}>
-        {rowEvents.map((event) => (
-          <Cell
-            key={event.id}
-            event={event}
-            checked={checked[event.id] || false}
-            onClick={() => onCellClick(event.id)}
-          />
-        ))}
-      </tr>
-    )
-  })
+import React, { useContext } from "react"
+import { BingoContext } from "@/contexts/BingoContext"
+import Cell from "@/components/Grid/Cell"
+
+const Grid = () => {
+  const { grid } = useContext(BingoContext)
 
   return (
-    <table>
-      <tbody>{gridRows}</tbody>
-    </table>
+    <>
+      <div className="grid">
+        {grid &&
+          grid.events &&
+          grid.events.length > 0 &&
+          grid.events.map((event) => <Cell key={event.id} id={event.id} />)}
+      </div>
+      {grid && grid.id && <p>Grid Code: {grid.id}</p>}
+    </>
   )
 }
 

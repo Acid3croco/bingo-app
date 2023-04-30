@@ -1,39 +1,19 @@
-import React, { useState } from "react"
-import db from "../../firebase/firebaseConfig"
+// components/Event/Event.js
 
-const Event = ({ event }) => {
-  const [editMode, setEditMode] = useState(false)
-  const [updatedEvent, setUpdatedEvent] = useState(event.name)
+import React, { useContext } from "react"
+import { BingoContext } from "@/contexts/BingoContext"
 
-  const updateEvent = async () => {
-    await db.collection("events").doc(event.id).update({ name: updatedEvent })
-    setEditMode(false)
-  }
-
-  const deleteEvent = async () => {
-    await db.collection("events").doc(event.id).delete()
-  }
+const Event = ({ id }) => {
+  const { deleteEvent, events } = useContext(BingoContext)
+  const event = events.find((e) => e.id === id)
 
   return (
-    <li>
-      {editMode ? (
-        <input
-          type="text"
-          value={updatedEvent}
-          onChange={(e) => setUpdatedEvent(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              updateEvent()
-            }
-          }}
-        />
-      ) : (
-        <span onDoubleClick={() => setEditMode(true)}>{event.name}</span>
-      )}
-
-      <button onClick={updateEvent}>Update</button>
-      <button onClick={deleteEvent}>Delete</button>
-    </li>
+    <div className="event">
+      <span>{event.name}</span>
+      <button className="bg-red-300 rounded" onClick={() => deleteEvent(id)}>
+        Delete
+      </button>
+    </div>
   )
 }
 
