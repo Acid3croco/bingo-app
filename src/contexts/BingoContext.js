@@ -147,16 +147,17 @@ const BingoProvider = ({ children }) => {
     })
   }, [])
 
-  useEffect(() => {
-    if (grid) {
-      const unsubscribe = db
-        .collection("grids")
-        .doc(grid.id)
-        .onSnapshot((snapshot) => {
-          setGrid(snapshot.data())
-        })
-    }
-  }, [grid])
+  // useEffect(() => {
+  //   console.log(`fetching grid from firebase`)
+  //   if (grid) {
+  //     const unsubscribe = db
+  //       .collection("grids")
+  //       .doc(grid.id)
+  //       .onSnapshot((snapshot) => {
+  //         setGrid(snapshot.data())
+  //       })
+  //   }
+  // }, [])
 
   return (
     <BingoContext.Provider
