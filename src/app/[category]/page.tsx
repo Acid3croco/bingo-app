@@ -2,56 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 
-const defaultEvents = [
-  "un candidat se blesse",
-  "un candidat se fait éliminer",
-  "un candidat se fait éliminer à l'unanimité",
-  "un candidat se fait éliminer à la majorité",
-
-  "un candidat boit du lait",
-  "un candidat boit de l'alcool",
-  "un candidat boit de l'eau",
-  "un candidat boit du café",
-  "un candidat boit du thé",
-  "un candidat boit du jus de fruit",
-  "un candidat boit du soda",
-
-  "un candidat mange de la viande",
-  "un candidat mange du poisson",
-  "un candidat mange des fruits",
-  "un candidat mange des légumes",
-  "un candidat mange des féculents",
-  "un candidat mange des produits laitiers",
-  "un candidat mange des sucreries",
-  "un candidat mange des fruits de mer",
-
-  "un candidat fait du feu",
-  "un candidat fait la vaisselle",
-  "un candidat fait la cuisine",
-  "un candidat fait la lessive",
-  "un candidat fait la sieste",
-
-  "un candidat se douche",
-  "un candidat se lave les dents",
-  "un candidat se lave les cheveux",
-  "un candidat se lave les mains",
-
-  "un candidat fait du sport",
-  "un candidat fait du yoga",
-  "un candidat fait du surf",
-  "un candidat fait du ski",
-
-  "un candidat se dispute",
-  "un candidat pleure",
-  "un candidat rit",
-  "un candidat chante",
-  "un candidat danse",
-
-  "un candidat se maquille",
-  "un candidat se coiffe",
-  "un candidat se rase",
-  "un candidat se parfume"
-]
+import { getDbEvents, setDbEvents } from "../../lib/FirebaseDb"
 
 type Score = {
   cells: number
@@ -76,12 +27,18 @@ export default function CategoryPage({
 }) {
   const [rowNb, setRowNb] = useState(4)
   const [colNb, setColNb] = useState(4)
-  const [rows, setRows] = useState([] as Event[][])
+  const [grid, setGrid] = useState([] as Event[][])
 
   const [bingo, setBingo] = useState(false)
 
-  const [events, setEvents] = useState(defaultEvents)
+  const [events, _setEvents] = useState([] as string[])
   const [lastEventId, setLastEventId] = useState([] as number[])
+
+  const setEvents = (events: string[]) => {
+    _setEvents(events)
+    eventsRef.current = events
+    setDbEvents(category, events)
+  }
 
   const [score, setScore] = useState({
     cells: 0,
@@ -92,7 +49,7 @@ export default function CategoryPage({
 
   const rowNbRef = useRef(rowNb)
   const colNbRef = useRef(colNb)
-  const rowsRef = useRef(rows)
+  const gridRef = useRef(grid)
   const scoreRef = useRef(score)
   const eventsRef = useRef(events)
 
@@ -101,7 +58,15 @@ export default function CategoryPage({
   const [regenerateToggle, setRegenerateToggle] = useState(false)
 
   useEffect(() => {
-    console.log(`useEffect generate rows`)
+    // get events from db
+    getDbEvents(category).then((_events) =>
+      setEvents(_events.map((event: any) => event.name))
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category])
+
+  useEffect(() => {
+    console.log(`useEffect generate grid`)
     const shuffle = (array: string[], size: number) => {
       const shuffled = array.sort(() => 0.5 - Math.random())
       const _events = shuffled.slice(0, size)
@@ -119,7 +84,7 @@ export default function CategoryPage({
 
     const suffledEvents = shuffle(eventsRef.current, rowNb * colNb)
 
-    const _rows = []
+    const _grid = []
     for (let i = 0; i < rowNb; i++) {
       const _row = []
       for (let j = 0; j < colNb; j++) {
@@ -129,9 +94,9 @@ export default function CategoryPage({
         }
         _row.push(suffledEvents[i * colNb + j])
       }
-      _rows.push(_row)
-      setRows(_rows)
-      rowsRef.current = _rows
+      _grid.push(_row)
+      setGrid(_grid)
+      gridRef.current = _grid
     }
 
     // reset score
@@ -144,13 +109,13 @@ export default function CategoryPage({
     setScore(scoreRef.current)
     //reset rollback
     setLastEventId([])
-  }, [setRows, rowNb, colNb, regenerateToggle])
+  }, [setGrid, rowNb, colNb, regenerateToggle])
 
   useEffect(() => {
-    if (!rowsRef.current.length) return
+    if (!gridRef.current.length) return
 
-    const _rows = rowsRef.current
-    const _newRows = []
+    const _grid = gridRef.current
+    const _newgrid = []
     const _newScore = {
       cells: 0,
       rows: 0,
@@ -159,7 +124,7 @@ export default function CategoryPage({
     } as Score
 
     // reset isRowFull and isColFull
-    _rows.forEach((row) => {
+    _grid.forEach((row) => {
       row.forEach((event) => {
         event.isRowFull = false
         event.isColFull = false
@@ -168,13 +133,13 @@ export default function CategoryPage({
     })
 
     // check cells for score
-    _rows.forEach((row) =>
+    _grid.forEach((row) =>
       row.forEach((event) => (event.checked ? _newScore.cells++ : null))
     )
 
     // check rows
-    for (let i = 0; i < _rows.length; i++) {
-      const row = _rows[i]
+    for (let i = 0; i < _grid.length; i++) {
+      const row = _grid[i]
       const isFullRow = row.every((event) => event.checked)
       if (isFullRow) {
         _newScore.rows++
@@ -182,13 +147,13 @@ export default function CategoryPage({
           event.isRowFull = true
         })
       }
-      _newRows.push(row)
+      _newgrid.push(row)
     }
 
     // check columns
-    const colLength = _rows[0].length
+    const colLength = _grid[0].length
     for (let i = 0; i < colLength; i++) {
-      const col = _rows.map((row) => row[i]).filter((event) => event)
+      const col = _grid.map((row) => row[i]).filter((event) => event)
       const isFullCol = col.every((event) => event.checked)
       if (isFullCol) {
         _newScore.cols++
@@ -202,8 +167,8 @@ export default function CategoryPage({
 
     // diagonal 1
     let diagonal = []
-    for (let i = 0; i < _rows.length; i++) {
-      const event = _rows[i][i]
+    for (let i = 0; i < _grid.length; i++) {
+      const event = _grid[i][i]
       if (!event) continue
       diagonal.push(event)
     }
@@ -216,8 +181,8 @@ export default function CategoryPage({
     }
     // diagonal 2
     diagonal = []
-    for (let i = 0; i < _rows.length; i++) {
-      const event = _rows[i][_rows.length - 1 - i]
+    for (let i = 0; i < _grid.length; i++) {
+      const event = _grid[i][_grid.length - 1 - i]
       if (!event) continue
       diagonal.push(event)
     }
@@ -229,28 +194,28 @@ export default function CategoryPage({
       })
     }
 
-    setRows(_newRows)
+    setGrid(_newgrid)
     setScore(_newScore)
-  }, [rowsRef, setRows, scoreRef, setScore, eventToggle])
+  }, [gridRef, setGrid, scoreRef, setScore, eventToggle])
 
   useEffect(() => {
-    score.cells === rowsRef.current.flat().length
-      ? setBingo(true)
-      : setBingo(false)
+    const gridLength = gridRef.current.flat().length
+    if (!gridLength) return
+    score.cells === gridLength ? setBingo(true) : setBingo(false)
   }, [score])
 
   const handleGoldenBuzzer = () => {
     // check a random event that is not already checked
-    if (score.cells === rowsRef.current.flat().length) return
+    if (score.cells === gridRef.current.flat().length) return
 
-    const lenRows = rows.length
-    const lenCols = rows[0].length
+    const lenRows = grid.length
+    const lenCols = grid[0].length
     const randomRow = Math.floor(Math.random() * lenRows)
     const randomCol = Math.floor(Math.random() * lenCols)
-    const randomEvent = rows[randomRow][randomCol]
+    const randomEvent = grid[randomRow][randomCol]
     if (randomEvent && !randomEvent.checked) {
       randomEvent.checked = true
-      setRows([...rows])
+      setGrid([...grid])
       setEventToggle(!eventToggle)
       setLastEventId([...lastEventId, randomEvent.id])
     } else {
@@ -267,12 +232,12 @@ export default function CategoryPage({
     if (lastEventIdCopyLast == null) return
 
     setLastEventId(lastEventIdCopy)
-    const lastEvent = rows
+    const lastEvent = grid
       .flat()
       .find((event) => event.id === lastEventIdCopyLast)
     if (!lastEvent) return
     lastEvent.checked = !lastEvent.checked
-    setRows([...rows])
+    setGrid([...grid])
     setEventToggle(!eventToggle)
   }
 
@@ -311,7 +276,7 @@ export default function CategoryPage({
 
       <table role="grid" className="table-fixed">
         <tbody>
-          {rows.map((row, i) => {
+          {grid.map((row, i) => {
             return (
               <tr key={i}>
                 {row.map((event, j) => {
@@ -321,7 +286,7 @@ export default function CategoryPage({
                       onClick={() => {
                         event.checked = !event.checked
                         setLastEventId([...lastEventId, event.id])
-                        setRows([...rows])
+                        setGrid([...grid])
                         setEventToggle(!eventToggle)
                       }}
                       className={`${event.checked ? "cell-selected" : ""} ${
@@ -357,7 +322,6 @@ export default function CategoryPage({
             }
             _events.push(_event)
             setEvents(_events)
-            eventsRef.current = _events
             event.currentTarget.event.value = ""
           }}
         >
@@ -381,7 +345,6 @@ export default function CategoryPage({
                       const _events = [...events]
                       _events.splice(index, 1)
                       setEvents(_events)
-                      eventsRef.current = _events
                     }}
                   >
                     x
@@ -397,7 +360,6 @@ export default function CategoryPage({
           className="bg-red-500"
           onClick={() => {
             setEvents([])
-            eventsRef.current = []
           }}
         >
           Flush ALL events
