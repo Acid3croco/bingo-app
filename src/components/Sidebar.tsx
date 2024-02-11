@@ -18,7 +18,7 @@ export function Sidebar() {
     let title = targets[0].value
 
     if (!title) {
-      toast("Title is required")
+      toast("Title is required...")
       return
     }
     if (bingosState.bingos.find((bingo) => bingo.title === title)) {
