@@ -22,8 +22,6 @@ export function Content() {
   const bingoDisptach = useContext(BingosDispatchContext)
   const bingo = bingosState.selectedBingo
 
-  const [selectedTags, setSelectedTags] = useState([] as string[])
-
   const addTag = (e: any) => {
     e.preventDefault()
     if (!bingo) return
@@ -62,7 +60,6 @@ export function Content() {
       type: "REMOVE_ALL_TAGS",
       payload: { id: bingo.id }
     })
-    setSelectedTags([])
   }
 
   return bingo ? (
