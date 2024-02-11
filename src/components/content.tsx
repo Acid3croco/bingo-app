@@ -56,20 +56,6 @@ export function Content() {
     })
   }
 
-  const selectTags = () => {
-    const bingoTags = bingosState.selectedBingo?.tags
-    if (!bingoTags) return
-    let tags = [...bingoTags]
-    if (tags.length === 0) {
-      toast("Please add tags to the bingo board...")
-      return
-    }
-
-    // select 16 random tags from the list
-    tags = tags.sort(() => Math.random() - 0.5).slice(0, 16)
-    setSelectedTags(tags)
-  }
-
   const clearAllTags = () => {
     if (!bingo) return
     bingoDisptach({
@@ -84,13 +70,8 @@ export function Content() {
       <div className="flex flex-col gap-8">
         {/* TITLE */}
         <h1 className="text-5xl font-bold">{bingo.title}</h1>
-        {/* BUTTONS */}
-        <div className="flex gap-4">
-          <Button onClick={selectTags}>Generate New Grid</Button>
-          <Button className="bg-yellow-400 text-black">GLODEN BUZZER</Button>
-        </div>
         {/* GRID */}
-        <Grid tags={selectedTags} />
+        <Grid />
         {/* TAGS */}
         <div className="flex gap-4 flex-col">
           <form onSubmit={addTag}>
