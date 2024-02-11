@@ -76,15 +76,17 @@ export function Content() {
           </form>
           <div className="grid grid-cols-4 gap-4">
             {bingo.tags.map((tag, i) => (
-              <Button key={i} variant="outline" className="h-full">
-                <div className="flex flex-wrap gap-2 align-baseline justify-between items-center whitespace-normal w-full h-full">
-                  <div className="text-left">{tag}</div>
-                  {/* add small red cross icon to remove */}
-                  <Badge variant="destructive" onClick={() => removeTag(tag)}>
-                    x
-                  </Badge>
-                </div>
-              </Button>
+              <div key={i} className="w-full">
+                <Button key={i} variant="outline" className="h-full w-full">
+                  <div className="flex flex-wrap gap-2 align-baseline justify-between items-center whitespace-normal w-full">
+                    <div className="text-left">{tag}</div>
+                    {/* add small red cross icon to remove */}
+                    <Badge variant="destructive" onClick={() => removeTag(tag)}>
+                      x
+                    </Badge>
+                  </div>
+                </Button>
+              </div>
             ))}
           </div>
           <Dialog>

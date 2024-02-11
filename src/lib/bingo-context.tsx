@@ -35,10 +35,13 @@ export function BingoProvider({
 
   useEffect(() => {
     if (!bingo || bingo.bingos.length === 0) return
+    // duplicate state to modify it
+    let state = { ...bingo }
+    state.selectedBingo = null
     // Function to save the current state to Firestore whenever it changes
     const saveStateToFirestore = async () => {
       const docRef = doc(db, "bingos", "singleton")
-      await setDoc(docRef, bingo, { merge: true }) // Merge true to update partially
+      await setDoc(docRef, state, { merge: true }) // Merge true to update partially
     }
 
     saveStateToFirestore()

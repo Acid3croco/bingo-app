@@ -173,7 +173,7 @@ export function Grid() {
           <h1 className="text-lg font-medium">Diags: {score.diags}</h1>
         </div>
         {/* Grid */}
-        <div className={`grid grid-cols-${4} gap-0 border-gray-200 border`}>
+        <div className={`grid grid-cols-4 gap-0 border-gray-200 border`}>
           {selectedTags.map((tag, i) => {
             // Calculate striping effect
             const isEvenRow = Math.floor(i / gridSize) % 2 === 0
