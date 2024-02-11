@@ -6,7 +6,7 @@ import {
   ResizablePanelGroup
 } from "@/components/ui/resizable"
 
-import { Sidebar } from "@/components/sidebar"
+import { Sidebar } from "@/components/sidebarzer"
 import { Content } from "@/components/content"
 import { BingoProvider } from "@/lib/bingo-context"
 
