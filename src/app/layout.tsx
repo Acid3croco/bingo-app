@@ -1,25 +1,26 @@
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
 import "./globals.css"
-import "../styles/theme.scss"
 
-import Sidebar from "@/components/Sidebar"
+import { Toaster } from "@/components/ui/sonner"
 
-export const metadata = {
+const inter = Inter({ subsets: ["latin"] })
+
+export const metadata: Metadata = {
   title: "Bingo App",
-  description: "A bingo app built with React and TypeScript."
+  description: "Create and Enjoy Bingo Games"
 }
 
 export default function RootLayout({
   children
-}: {
+}: Readonly<{
   children: React.ReactNode
-}) {
+}>) {
   return (
-    <html>
-      <body>
-        <div className="flex gap-4">
-          <Sidebar />
-          <main>{children}</main>
-        </div>
+    <html lang="en">
+      <body className={inter.className}>
+        {children}
+        <Toaster />
       </body>
     </html>
   )

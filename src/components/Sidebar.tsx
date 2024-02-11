@@ -1,60 +1,60 @@
-"use client"
+import { useContext } from "react"
 
-import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
-export default function Sidebar() {
-  const [categories, setCategories] = useState<string[]>([
-    "Koh-Lanta",
-    "Un diner presque parfait",
-    "Les Marseillais"
-  ])
+import { BingosContext, BingosDispatchContext } from "@/lib/bingo-context"
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const category = formData.get("category")
-    if (category) {
-      setCategories([...categories, category.toString()])
+export function Sidebar() {
+  const bingosState = useContext(BingosContext)
+  const bingoDispatch = useContext(BingosDispatchContext)
+
+  const addBingo = (e: any) => {
+    e.preventDefault()
+    let targets = e.target as any
+    let title = targets[0].value
+
+    if (!title) {
+      toast("Title is required")
+      return
     }
-    event.currentTarget.reset()
+    if (bingosState.bingos.find((bingo) => bingo.title === title)) {
+      toast("Bingo already exists!")
+      return
+    }
+    bingoDispatch({
+      type: "ADD_BINGO",
+      payload: { id: bingosState.bingos.length + 1, title, tags: [] }
+    })
+    toast("Bingo successfully added")
   }
 
-  const pathname = usePathname()
-
   return (
-    <div>
-      <aside className="px-2" style={{ width: "250px" }}>
-        <nav>
-          <ul>
-            {categories.map((category) => {
-              const path = category.toLowerCase().replace(/ /g, "-")
-              return (
-                <li
-                  key={path}
-                  className={`${
-                    pathname === `/${path}` ? "category-active" : ""
-                  }`}
-                >
-                  <Link href={`/${path}`}>{category}</Link>
-                </li>
-              )
-            })}
-            <li>
-              <form onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  id="category"
-                  name="category"
-                  placeholder="New category"
-                />
-              </form>
-            </li>
-          </ul>
-        </nav>
-      </aside>
-    </div>
+    <ScrollArea className="w-full h-screen">
+      <div className="flex flex-col gap-4 px-4">
+        <h3 className="text-lg pt-4 font-medium leading-none">Bingo Boards</h3>
+        <form onSubmit={addBingo}>
+          <Input placeholder="Add Bingo" />
+        </form>
+
+        {bingosState.bingos.map((bingo) => (
+          <Button
+            key={bingo.id}
+            variant="ghost"
+            className={`w-full justify-start ${
+              bingosState.selectedBingo?.id === bingo.id ? "bg-gray-200" : ""
+            }`}
+            onClick={() => {
+              bingoDispatch({ type: "SELECT_BINGO", payload: bingo })
+            }}
+          >
+            {bingo.title}
+          </Button>
+        ))}
+      </div>
+    </ScrollArea>
   )
 }
