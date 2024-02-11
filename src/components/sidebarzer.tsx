@@ -32,6 +32,11 @@ export function Sidebar() {
     toast("Bingo successfully added")
   }
 
+  const selectBingo = (bingo: any) => {
+    if (bingosState.selectedBingo?.id === bingo.id) return
+    bingoDispatch({ type: "SELECT_BINGO", payload: bingo })
+  }
+
   return (
     <ScrollArea className="w-full h-screen">
       <div className="flex flex-col gap-4 px-4">
@@ -47,9 +52,7 @@ export function Sidebar() {
             className={`w-full justify-start ${
               bingosState.selectedBingo?.id === bingo.id ? "bg-gray-200" : ""
             }`}
-            onClick={() => {
-              bingoDispatch({ type: "SELECT_BINGO", payload: bingo })
-            }}
+            onClick={() => selectBingo(bingo)}
           >
             {bingo.title}
           </Button>
