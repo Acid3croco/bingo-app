@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useRef, useState } from "react"
 
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -16,6 +16,8 @@ export function Grid() {
     new Array(selectedTags.length).fill(false)
   )
 
+  const currBingoId = useRef(bingo?.id)
+
   const generateGrid = useCallback(() => {
     if (!bingo) return
     const bingoTags = bingo.tags
@@ -32,7 +34,11 @@ export function Grid() {
   }, [bingo])
 
   useEffect(() => {
-    generateGrid()
+    if (bingo?.id !== currBingoId.current) {
+      setSelectedTags([])
+      generateGrid()
+      currBingoId.current = bingo?.id
+    }
   }, [bingo, generateGrid])
 
   // Toggle cell selection
